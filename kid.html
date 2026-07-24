@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KidZone! 🚀 Games, Fun Facts & Art</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4ECDC4;
+            --accent: #FFE66D;
+            --dark: #292F36;
+            --light: #F7FFF7;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Bubblegum Sans', cursive, sans-serif;
+            background: linear-gradient(135deg, #a8ede0 0%, #fed6e3 100%);
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            text-align: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            text-shadow: 2px 2px 0px #ff3333;
+        }
+
+        nav {
+            margin-top: 15px;
+        }
+
+        nav button {
+            background-color: var(--secondary);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 1.2rem;
+            border-radius: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #369b94;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        nav button:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #369b94;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Fun Facts Styling */
+        #fact-box {
+            font-size: 1.5rem;
+            background-color: var(--accent);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 4px dashed var(--primary);
+        }
+
+        /* Mini Game Styling */
+        .game-btn {
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.5rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px 0 #cc4444;
+            margin-top: 20px;
+        }
+
+        .game-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 0 0 #cc4444;
+        }
+
+        #score {
+            font-size: 1.8rem;
+            color: #333;
+            margin-top: 15px;
+        }
+
+        /* Drawing Canvas Styling */
+        canvas {
+            border: 4px solid var(--secondary);
+            background: white;
+            border-radius: 15px;
+            cursor: crosshair;
+            touch-action: none;
+        }
+
+        .tools {
+            margin-top: 15px;
+        }
+
+        .tools button {
+            background-color: var(--dark);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌟 KidZone! 🌟</h1>
+        <p>Pick a fun activity below!</p>
+        <nav>
+            <button onclick="showSection('home')">🏠 Home</button>
+            <button onclick="showSection('facts')">🧠 Fun Facts</button>
+            <button onclick="showSection('game')">🎮 Clicker Game</button>
+            <button onclick="showSection('art')">🎨 Doodle Pad</button>
+        </nav>
+    </header>
+
+    <div class="container">
+        <!-- Home Section -->
+        <div id="home" class="section active">
+            <h2>Welcome to your playground! 🎉</h2>
+            <p style="font-size: 1.3rem;">Use the menu above to read cool facts, play a game, or draw your own masterpiece!</p>
+            <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?w=400" alt="Colorful toys" style="border-radius: 15px; max-width: 100%; height: auto;">
+        </div>
+
+        <!-- Fun Facts Section -->
+        <div id="facts" class="section">
+            <h2>Did You Know? 🤯</h2>
+            <div id="fact-box">Click the button below to load a super cool fact!</div>
+            <button class="game-btn" onclick="getRandomFact()">Show Me Another Fact!</button>
+        </div>
+
+        <!-- Mini Game Section -->
+        <div id="game" class="section">
+            <h2>Star Catcher Game ⭐</h2>
+            <p>Click the bouncing star as many times as you can in 10 seconds!</p>
+            <div id="score">Score: 0</div>
+            <button id="click-target" class="game-btn" style="background-color: var(--accent); color: var(--dark);" onclick="incrementScore()">⭐ CLICK ME! ⭐</button>
+            <br><br>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+
+        <!-- Art Section -->
+        <div id="art" class="section">
+            <h2>Doodle Pad 🎨</h2>
+            <canvas id="drawCanvas" width="400" height="300"></canvas>
+            <div class="tools">
+                <button onclick="changeColor('#FF6B6B')">🔴 Red</button>
+                <button onclick="changeColor('#4ECDC4')">🔵 Teal</button>
+                <button onclick="changeColor('#FFE66D')">🟡 Yellow</button>
+                <button onclick="changeColor('#292F36')">⚫ Black</button>
+                <button onclick="clearCanvas()">🧹 Clear</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation Handler
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Fun Facts Generator
+        const facts = [
+            "Bananas are curved because they grow towards the sun! 🍌",
+            "Octopuses have three hearts and blue blood! 🐙",
+            "Sea otters hold hands while they sleep so they don't float away! 🦦",
+            "A group of flamingos is called a 'flamboyance'! 🦩",
+            "Honey never spoils; archaeologists have found 3,000-year-old honey in tombs that is still good to eat! 🍯",
+            "Cows have best friends and get stressed when they are separated! 🐮"
+        ];
+
+        function getRandomFact() {
+            const randomIndex = Math.floor(Math.random() * facts.length);
+            document.getElementById('fact-box').innerText = facts[randomIndex];
+        }
+
+        // Clicker Game Logic
+        let score = 0;
+        let gameActive = false;
+
+        function startGame() {
+            if (gameActive) return;
+            score = 0;
+            gameActive = true;
+            document.getElementById('score').innerText = `Score: ${score}`;
+            
+            setTimeout(() => {
+                gameActive = false;
+                alert(`Game Over! Your final score is ${score} stars! 🌟`);
+            }, 10000);
+        }
+
+        function incrementScore() {
+            if (gameActive) {
+                score++;
+                document.getElementById('score').innerText = `Score: ${score}`;
+            }
+        }
+
+        // Drawing Canvas Logic
+        const canvas = document.getElementById('drawCanvas');
+        const ctx = canvas.getContext('2d');
+        let painting = false;
+        let brushColor = '#292F36';
+
+        function startPosition(e) {
+            painting = true;
+            draw(e);
+        }
+
+        function endPosition() {
+            painting = false;
+            ctx.beginPath();
+        }
+
+        function draw(e) {
+            if (!painting) return;
+            ctx.lineWidth = 5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = brushColor;
+
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - rect.left;
+            const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+            ctx.lineTo(x, y);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+        }
+
+        function changeColor(color) {
+            brushColor = color;
+        }
+
+        function clearCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        canvas.addEventListener('mousedown', startPosition);
+        canvas.addEventListener('mouseup', endPosition);
+        canvas.addEventListener('mousemove', draw);
+
+        canvas.addEventListener('touchstart', startPosition);
+        canvas.addEventListener('touchend', endPosition);
+        canvas.addEventListener('touchmove', draw);
+    </script>
+</body>
+</html>
